@@ -140,8 +140,10 @@ void deleteCourse(Semester& sm, int key);
 Semester getCourseforStudent(Student stu);
 void createScoreBoardFile(Semester sm);
 void readScoreBoard(Semester& sm);
+void readScoreforStudent(Semester sm, Student& st);
 Student inputStudent();
 int check_login(UserArray usA, User us);
+void createAllScoreFile(Semester sm);
 User inputUser(int pos);
 User login(UserArray usA);
 void printStaffInfo(StaffInfo si, int n);
@@ -957,6 +959,9 @@ void createScoreBoardFile(Semester sm) {
 	LPCSTR folderName = path.c_str();
 	CreateDirectoryA(folderName, NULL);
 	ofstream fileout;
+	path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\allscore.csv";
+	fileout.open(path, ios::out);
+	fileout.close();
 	for (int i = 0; i < sm.n; i++) {
 		path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\" + sm.course[i].id + ".csv";
 		fileout.open(path, ios::out);
@@ -1009,6 +1014,87 @@ void updateScoreBoard(Semester& sm, int key1, int key2,int key3, float change) {
 	fileout << sm.course[key1 - 1].students[i].id << "," << sm.course[key1 - 1].students[i].lastName << " " << sm.course[key1 - 1].students[i].firstName << "," << sm.course[key1 - 1].students[i].mark.total << "," << sm.course[key1 - 1].students[i].mark.final << "," << sm.course[key1 - 1].students[i].mark.midterm << "," << sm.course[key1 - 1].students[i].mark.other;
 	fileout.close();
 }
+void createAllScoreFile(Semester sm) {
+	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\allscore.csv";
+	ofstream fileout;
+	fileout.open(path, ios::out);
+	for (int i = 0; i < sm.n; i++) {
+		for (int j = 0; j < sm.course[i].n-1 ; j++) {
+			fileout << sm.course[i].students[j].id << "," << sm.course[i].name<<","<< sm.course[i].students[j].mark.total<<","<< sm.course[i].students[j].mark.final<<"," << sm.course[i].students[j].mark.midterm<<","<< sm.course[i].students[j].mark.other << endl;
+			cout << sm.course[i].students[j].id << "," << sm.course[i].name << "," << sm.course[i].students[j].mark.total << "," << sm.course[i].students[j].mark.final << "," << sm.course[i].students[j].mark.midterm << "," << sm.course[i].students[j].mark.other << endl;
+		}
+	}
+	fileout.close();
+}
+void readScoreforStudent(Semester sm,Student &st) {
+	st.markofCourse = new MarkofCourse[10];
+	st.n = 0;
+	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\allscore.csv";
+	ifstream filein;
+	filein.open(path, ios::in);
+	if (!filein.is_open()) return;
+	int cnt = 0;
+	while (!filein.eof()) {
+		string temp;
+		getline(filein, temp, ',');
+		if (temp == st.id) {
+			getline(filein,st.markofCourse[cnt].courseName, ',');
+			filein >> st.markofCourse[cnt].mark.total;
+			filein.seekg(1, 1);
+			filein >> st.markofCourse[cnt].mark.final;
+			filein.seekg(1, 1);
+			filein >> st.markofCourse[cnt].mark.midterm;
+			filein.seekg(1, 1);
+			filein >> st.markofCourse[cnt].mark.other;
+			getline(filein, temp);
+			cnt++;
+			st.n++;
+		}
+		else {
+			getline(filein, temp);
+		}
+	}
+}
+void readScoreforClass(Semester sm, SchoolYear &schoolYear) {
+	for (int i = 0; i < schoolYear.n; i++) {
+		for (int j = 0; j < schoolYear.schoolLevel[i].n;j++) {
+			for (int k = 0; k < schoolYear.schoolLevel[i].classes[j].n;k++) {
+				readScoreforStudent(sm,schoolYear.schoolLevel[i].classes[i].Students[k]);
+			}
+		} 
+	}
+}
+void showClasswithScore(SchoolYear sy, string ClassName) {
+	double diem = 0;
+	cout << YELLOW;
+	cout << setw(15) << "" << left << setw(10) << "No";
+	cout << left << setw(15) << "ID";
+	cout << left << setw(30) << "Full name";
+	cout << RESET;
+	cout << right << setw(30);
+	cout << endl;
+	for (int i = 0; i < sy.n; i++) {
+		for (int j = 0; j < sy.schoolLevel[i].n; j++) {
+			if (ClassName == sy.schoolLevel[i].classes[j].name) {
+				for (int k = 0; k < sy.schoolLevel[i].classes[j].n; k++) {
+					cout << setw(10) << "" << left << setw(10) << GREEN << k + 1<<".";
+					cout << left << setw(13) << GREEN << sy.schoolLevel[i].classes[j].Students[k].id;
+					cout << left << setw(12) << GREEN << sy.schoolLevel[i].classes[j].Students[k].lastName << " " << sy.schoolLevel[i].classes[j].Students[k].firstName << RESET;
+					cout << right << setw(12);
+					cout << endl;
+					readScoreforStudent(curSemester, sy.schoolLevel[i].classes[j].Students[k]);
+					for (int h = 0; h < sy.schoolLevel[i].classes[j].Students[k].n; h++) {
+						cout <<setw(15)<<""<<YELLOW<<"-->" << sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].courseName << RESET << ": " << sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].mark.final << endl;
+						diem = diem + sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].mark.final;
+					}
+					cout << setw(15) << "" << YELLOW << "-->GPA: " << RESET << diem / sy.schoolLevel[i].classes[j].Students[k].n  << endl;
+					diem = 0;
+				}
+				break;
+			}
+		}
+	}
+};
 User inputUser(int pos) {
 	User us;
 	cout << "\n\n\n\n\n\n\n\n\n\n\n";
@@ -1414,6 +1500,7 @@ void courseOption() {
 	char key;
 	int pos = 61;
 	Course cs;
+	SchoolYear curSchoolYear;
 	string schoolYearName;
 	string className;
 	string schoolLevel;
@@ -1528,9 +1615,15 @@ void courseOption() {
 				cout << setw(45) << "" << GREEN << "Done!" << RESET;
 			}
 			if (selectedItem == 5) {
-				readScoreBoard(curSemester);
-				cout << setw(45) << "" << GREEN << "Choose a course you want to view: " << RESET;
+				cout << setw(45) << "" << GREEN << "1. View scoreboard of course"<<endl << RESET;
+				cout << setw(45) << "" << GREEN << "2. View scoreboard of class"<<endl << RESET;
+				cout << setw(45) << "" << GREEN << "Your choose: " << RESET;
 				cin >> key1;
+				cin.ignore();
+				if (key1 == 1) {
+					readScoreBoard(curSemester);
+					cout << setw(45) << "" << GREEN << "Choose a course you want to view: " << RESET;
+					cin >> key1;
 					cout << setw(20) << "" << YELLOW << "Course: " << RESET << curSemester.course[key1 - 1].name << endl;
 					cout << setw(20) << "" << YELLOW << "Teacher: " << RESET << curSemester.course[key1 - 1].teacherName << endl;
 					showScoreboardinCourse(curSemester, key1);
@@ -1548,6 +1641,18 @@ void courseOption() {
 						updateScoreBoard(curSemester, key1, key2, key3, diem);
 						cout << setw(45) << "" << GREEN << "Done!" << RESET;
 					}
+				}
+				else {
+					for (int i = 0; i < schoolYearArray.n; i++) {
+						if (schoolYearArray.schoolYears[i].name == curSemester.nameYear) {
+							curSchoolYear = schoolYearArray.schoolYears[i];
+							break;
+						}
+					}
+					cout << setw(45) << "" << GREEN << "Input a class you want to view: " << RESET;
+					getline(cin, className);
+					showClasswithScore(curSchoolYear,className);
+				}
 			}
 			if (selectedItem == 6) return;
 			int x = _getch();
@@ -1753,6 +1858,38 @@ void Student_menu() {
 			if (selectedItem == 1) {
 				couforStu = getCourseforStudent(stu);
 				showListofCourse(couforStu);
+			}
+			if (selectedItem == 2) {
+				double dtb = 0;
+				readScoreforStudent(curSemester, stu);
+				cout << YELLOW;
+				cout << setw(20) << "" << left << setw(10) << "No";
+				cout << left << setw(30) << "Course";
+				cout << left << setw(15) << "Total mark";
+				cout << left << setw(15) << "Final mark";
+				cout << left << setw(15) << "Midterm mark";
+				cout << left << setw(15) << "Other mark";
+				cout << right << setw(15);
+				cout << RESET;
+				cout << endl;
+				cout << setw(20) << "" << "--<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->--";
+				cout << endl;
+				if (stu.markofCourse==NULL) return;
+				for (int i = 0; i < stu.n; i++) {
+					cout << setw(20) << "" << left << setw(10) << i + 1;
+					cout << left << setw(34) << stu.markofCourse[i].courseName;
+					cout << left << setw(15) << stu.markofCourse[i].mark.total;
+					cout << left << setw(15) << stu.markofCourse[i].mark.final;
+					cout << left << setw(15) << stu.markofCourse[i].mark.midterm;
+					cout << left << setw(15) << stu.markofCourse[i].mark.other;
+					cout << right << setw(15);
+					cout << endl;
+					dtb += stu.markofCourse[i].mark.total;
+				}
+				cout << YELLOW;
+				dtb = dtb / stu.n;
+				cout << setw(20) << "" << "-------->GPA: " << RESET << dtb << endl;
+
 			}
 			if (selectedItem == 3) {
 				changePassword(userArray, us);
