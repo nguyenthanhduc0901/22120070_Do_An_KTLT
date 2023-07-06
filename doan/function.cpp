@@ -1,101 +1,4 @@
-﻿#include <iostream>
-#include <fstream>
-#include <string>
-#include <Windows.h>
-#include <iomanip>
-#include <conio.h>
-using namespace std;
-#define RESET   "\033[0m"
-#define RED     "\033[31m"
-#define GREEN   "\033[32m"
-#define YELLOW  "\033[33m"
-#define BLUE    "\033[34m"
-#define MAGENTA "\033[35m"
-#define CYAN    "\033[36m"
-#define WHITE   "\033[37m"
-
-struct User {
-	string username;
-	string password;
-};
-struct UserArray {
-	User* user;
-	int n;
-};
-struct StaffInfo {
-	string email;
-	string name;
-	string dateofBirth;
-	string sex;
-	string id;
-	string position;
-};
-struct StaffInfoArray {
-	StaffInfo* staffInfo;
-	int n;
-};
-struct Mark {
-	float total;
-	float final;
-	float midterm;
-	float other;
-};
-struct MarkofCourse {
-	string courseName;
-	Mark mark;
-};
-struct Student {
-	string id;
-	string lastName;
-	string firstName;
-	string sex;
-	string dateofBirth;
-	string socialid;
-	Mark mark;
-	MarkofCourse* markofCourse;
-	int n;
-};
-struct Class {
-	string name;
-	Student* Students=NULL;
-	int n=0;
-};
-struct SchoolLevel {
-	string name;
-	Class* classes=NULL;
-	int n=0;
-};
-struct Course {
-	string id="";
-	string name="";
-	string className="";
-	string teacherName="";
-	int numOfCre=0;
-	int maxStu=0;
-	string day="";
-	string time="";
-	Student* students=NULL;
-	int n=0;
-};
-struct Semester {
-	int name=0;
-	string nameYear;
-	string startDate;
-	string endDate;
-	Course* course=NULL;
-	int n=0;
-};
-struct SchoolYear {
-	string name;
-	SchoolLevel* schoolLevel=NULL;
-	Semester semester[3];
-	int n=0;
-};
-struct SchoolYearArray {
-	SchoolYear* schoolYears=NULL;
-	int n=0;
-};
-
+#include "function.h"
 UserArray userArray;
 StaffInfoArray staffInfoArray;
 SchoolYearArray schoolYearArray;
@@ -104,64 +7,6 @@ SchoolYear newSchoolYear;
 Class newStudentsArray;
 Semester curSemester;
 User us;
-int releftPadding(string text);
-bool checkSubstring(const string& mainString, const string& subString);
-Student* resizeStudentArray(Student* arr, int size, int newSize);
-Class* resizeClassesArray(Class* arr, int size, int newSize);
-SchoolYear* resizeSchoolYearArray(SchoolYear* arr, int size, int newSize);
-Course* resizeCourseArray(Course* arr, int size, int newSize);
-bool isFileEmpty(string& fileName);
-StaffInfoArray getStaffInfoArray();
-Class getstudentInfoArray();
-UserArray getUserArray();
-StaffInfo getCurStaffInfo(StaffInfoArray siA, User us);
-Student getCurStudentInfo(Class cl, User us);
-Class getClass(string ClassName, string path);
-SchoolLevel getSchoolLevel(string SchoolLevelName, string path);
-void initSchoolYear(SchoolYear& sY);
-void getCourse(Semester sm, Course &cou);
-void getSemester(Semester& sem);
-SchoolYear getSchoolYear(string SchoolYearName);
-SchoolYearArray getSchoolYearArray();
-SchoolYear createSchoolYear(SchoolYearArray &sYA, string schoolYearName);
-void addClasstoSchoolYear(SchoolYear& sY, string schoolLevel, string className);
-void quickInputNewStudent(SchoolYear& schoolYear, Class newStuArr);
-string returnNameofSemester(int n);
-Semester createSemester();
-void addSemestertoSchoolYear(SchoolYearArray& lsy, Semester sm);
-Semester getCurSemester(SchoolYearArray lsy);
-Course createCourse();
-void addCoursetoSemester(SchoolYearArray& lsy, Semester& sm, Course cs);
-void addStudenttoCourse(SchoolYear &sy);
-void updateCourse(Semester& sm, int key1, int key2, string change);
-void addaStudenttoCourse(Semester& sm, int key, Student stu);
-void removeaStudentfromCourse(Semester& sm, int key1, int key2);
-void deleteCourse(Semester& sm, int key);
-Semester getCourseforStudent(Student stu);
-void createScoreBoardFile(Semester sm);
-void readScoreBoard(Semester& sm);
-void readScoreforStudent(Semester sm, Student& st);
-Student inputStudent();
-int check_login(UserArray usA, User us);
-void createAllScoreFile(Semester sm);
-User inputUser(int pos);
-User login(UserArray usA);
-void printStaffInfo(StaffInfo si, int n);
-void changePassword(UserArray& usA, User& us);
-void userAccount(StaffInfo si, User &us);
-void Staff_menu();
-void Student_menu();
-void menu();
-int main() {
-	schoolYearArray = getSchoolYearArray();
-	newStudentsArray = getClass("NewStudent", "source\\new_students.csv");
-	curSemester = getCurSemester(schoolYearArray);
-	//createScoreBoardFile(curSemester);
-	//readScoreBoard(curSemester);
-	
-	menu();
-	return 0;
-}
 int releftPadding(string text) {
 	HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
@@ -238,7 +83,7 @@ Course* resizeCourseArray(Course* arr, int size, int newSize) {
 		newArr[i].time = "";
 		newArr[i].maxStu = 0;
 		newArr[i].numOfCre = 0;
-		newArr[i].students= NULL;
+		newArr[i].students = NULL;
 		newArr[i].n = 0;
 	}
 	delete[] arr;
@@ -324,8 +169,14 @@ void initSchoolYear(SchoolYear& sY) {
 	sY.semester[1].course = NULL;
 	sY.semester[2].course = NULL;
 }
-void getCourse(Semester sm, Course &cou) {
-	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\" + cou.id+".csv";
+string returnNameofSemester(int n) {
+	if (n == 1) return "semester1";
+	if (n == 2) return "semester2";
+	if (n == 3) return "semester3";
+	return "";
+}
+void getCourse(Semester sm, Course& cou) {
+	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\" + cou.id + ".csv";
 	ifstream filein(path, ios::in);
 	if (!filein.is_open()) return;
 	string line;
@@ -347,7 +198,7 @@ void getCourse(Semester sm, Course &cou) {
 	}
 	filein.close();
 }
-void getSemester(Semester &sem) {
+void getSemester(Semester& sem) {
 	sem.n = 0;
 	string path = "source\\" + sem.nameYear + "\\" + returnNameofSemester(sem.name) + "\\course.csv";
 	ifstream filein(path, ios::in);
@@ -359,8 +210,8 @@ void getSemester(Semester &sem) {
 	filein.open(path, ios::in);
 	sem.course = new Course[sem.n];
 	int cnt = 0;
-	while (cnt!=sem.n) {
-		getline(filein, sem.course[cnt].id,',');
+	while (cnt != sem.n) {
+		getline(filein, sem.course[cnt].id, ',');
 		getline(filein, sem.course[cnt].name, ',');
 		getline(filein, sem.course[cnt].className, ',');
 		getline(filein, sem.course[cnt].teacherName, ',');
@@ -368,7 +219,7 @@ void getSemester(Semester &sem) {
 		getline(filein, sem.course[cnt].time, ',');
 		filein >> sem.course[cnt].numOfCre;
 		filein.seekg(1, 1);
-		filein >> sem.course[cnt].maxStu; 
+		filein >> sem.course[cnt].maxStu;
 		string line1;
 		getline(filein, line1);
 		cnt++;
@@ -410,7 +261,7 @@ SchoolYear getSchoolYear(string SchoolYearName) {
 	return sY;
 }
 SchoolYearArray getSchoolYearArray() {
-	SchoolYearArray lSY={NULL,0};
+	SchoolYearArray lSY = { NULL,0 };
 	ifstream filein("source\\school_year.csv", ios::in);
 	string line;
 	while (getline(filein, line)) lSY.n++;
@@ -430,7 +281,7 @@ SchoolYearArray getSchoolYearArray() {
 	filein.close();
 	return lSY;
 };
-SchoolYear createSchoolYear(SchoolYearArray &sYA, string schoolYearName) {
+SchoolYear createSchoolYear(SchoolYearArray& sYA, string schoolYearName) {
 	SchoolYear sY;
 	sY.name = schoolYearName;
 	initSchoolYear(sY);
@@ -501,7 +352,7 @@ void addClasstoSchoolYear(SchoolYear& sY, string schoolLevel, string className) 
 		fileout.close();
 		return;
 	}
-	sY.schoolLevel[0].classes =resizeClassesArray(sY.schoolLevel[0].classes, sY.schoolLevel[0].n, sY.schoolLevel[0].n + 1);
+	sY.schoolLevel[0].classes = resizeClassesArray(sY.schoolLevel[0].classes, sY.schoolLevel[0].n, sY.schoolLevel[0].n + 1);
 	sY.schoolLevel[0].n++;
 	sY.schoolLevel[0].classes[sY.schoolLevel[0].n - 1] = cl;
 	string path = "source\\" + sY.name + "\\" + sY.schoolLevel[0].name + "\\class.csv";
@@ -512,7 +363,7 @@ void addClasstoSchoolYear(SchoolYear& sY, string schoolLevel, string className) 
 }
 Student inputStudent() {
 	Student st;
-	cout << setw(45) << ""<<"ID: ";
+	cout << setw(45) << "" << "ID: ";
 	getline(cin, st.id);
 	cout << setw(45) << "" << "Last name: ";
 	getline(cin, st.lastName);
@@ -548,20 +399,20 @@ Semester getCourseforStudent(Student stu) {
 	}
 	return sm;
 }
-void addAStudentToSTArray(Class &cl, Student st) {
+void addAStudentToSTArray(Class& cl, Student st) {
 	if (cl.Students == NULL) {
 		cl.n = 1;
 		cl.Students = new Student[cl.n];
 		cl.Students[cl.n - 1] = st;
 		return;
 	}
-	cl.Students=resizeStudentArray(cl.Students, cl.n, cl.n + 1);
+	cl.Students = resizeStudentArray(cl.Students, cl.n, cl.n + 1);
 	cl.n++;
 	cl.Students[cl.n - 1] = st;
 }
-void addStudenttoFile(Student st,string path) {
+void addStudenttoFile(Student st, string path) {
 	ofstream fileout(path, ios::app);
-	if(!isFileEmpty(path)) fileout << endl;
+	if (!isFileEmpty(path)) fileout << endl;
 	fileout << st.id << "," << st.lastName << "," << st.firstName << "," << st.dateofBirth << "," << st.sex << "," << st.socialid;
 	fileout.close();
 }
@@ -577,7 +428,7 @@ void addStudenttoFileUser(Student st, string path) {
 	fileout << st.id << "," << 123;
 	fileout.close();
 }
-void quickInputNewStudent(SchoolYear &schoolYear,Class newStuArr) {
+void quickInputNewStudent(SchoolYear& schoolYear, Class newStuArr) {
 	string path;
 	for (int i = 0; i < newStuArr.n; i++) {
 		for (int j = 0; j < schoolYear.schoolLevel[0].n; j++) {
@@ -609,11 +460,11 @@ void addStudent(SchoolYear& schoolYear, string className, Student st) {
 		for (int j = 0; j < schoolYear.schoolLevel[i].n; j++) {
 			if (schoolYear.schoolLevel[i].classes[j].name == className) {
 				addAStudentToSTArray(schoolYear.schoolLevel[i].classes[j], st);
-				string path = "source\\" + schoolYear.name + "\\" + schoolYear.schoolLevel[i].name + "\\"+schoolYear.schoolLevel[i].classes[j].name + ".csv";
+				string path = "source\\" + schoolYear.name + "\\" + schoolYear.schoolLevel[i].name + "\\" + schoolYear.schoolLevel[i].classes[j].name + ".csv";
 				addStudenttoFile(st, path);
-				path="source\\student_info.csv";
+				path = "source\\student_info.csv";
 				addStudenttoFileInfo(st, path);
-				path= "source\\user.csv";
+				path = "source\\user.csv";
 				addStudenttoFileUser(st, path);
 				return;
 			}
@@ -635,13 +486,7 @@ Semester createSemester() {
 	x.n = 0;
 	return x;
 }
-string returnNameofSemester(int n) {
-	if (n == 1) return "semester1";
-	if (n == 2) return "semester2";
-	if (n == 3) return "semester3";
-	return "";
-}
-void addSemestertoSchoolYear(SchoolYearArray &lsy,Semester sm) {
+void addSemestertoSchoolYear(SchoolYearArray& lsy, Semester sm) {
 	string nameSem = returnNameofSemester(sm.name);
 	string path;
 	path = "source\\" + sm.nameYear + "\\semester.csv";
@@ -649,7 +494,7 @@ void addSemestertoSchoolYear(SchoolYearArray &lsy,Semester sm) {
 	if (!isFileEmpty(path)) fileout << endl;
 	fileout << nameSem << "," << sm.startDate << "," << sm.endDate;
 	fileout.close();
-	path = "source\\" + sm.nameYear+ "\\"  + nameSem;
+	path = "source\\" + sm.nameYear + "\\" + nameSem;
 	LPCSTR folderName = path.c_str();
 	CreateDirectoryA(folderName, NULL);
 	path = path + "\\course.csv";
@@ -657,7 +502,7 @@ void addSemestertoSchoolYear(SchoolYearArray &lsy,Semester sm) {
 	fileout.close();
 	for (int i = 0; i < lsy.n; i++) {
 		if (lsy.schoolYears[i].name == sm.nameYear) {
-			lsy.schoolYears[i].semester[sm.name-1] = sm;
+			lsy.schoolYears[i].semester[sm.name - 1] = sm;
 			break;
 		}
 	}
@@ -690,13 +535,13 @@ Semester getCurSemester(SchoolYearArray lsy) {
 	return sm;
 }
 Course createCourse() {
-	Course cou; 
+	Course cou;
 	cout << setw(45) << "" << GREEN << "ID: " << RESET;
 	getline(cin, cou.id);
 	cout << setw(45) << "" << GREEN << "Name of course: " << RESET;
 	getline(cin, cou.name);
-	cout << setw(45) << "" <<GREEN << "Class: " << RESET;
-	getline(cin, cou.className); 
+	cout << setw(45) << "" << GREEN << "Class: " << RESET;
+	getline(cin, cou.className);
 	cout << setw(45) << "" << GREEN << "Teacher name: " << RESET;
 	getline(cin, cou.teacherName);
 	cout << setw(45) << "" << GREEN << "Max student: " << RESET;
@@ -712,14 +557,14 @@ Course createCourse() {
 	cou.n = 0;
 	return cou;
 }
-void addCoursetoSemester(SchoolYearArray& lsy,Semester &sm, Course cs) {
+void addCoursetoSemester(SchoolYearArray& lsy, Semester& sm, Course cs) {
 	ofstream fileout;
 	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\course.csv";
 	fileout.open(path, ios::app);
 	if (!isFileEmpty(path)) fileout << endl;
-	fileout << cs.id << "," << cs.name << "," << cs.className << "," << cs.teacherName << "," << cs.day << "," << cs.time<<"," << cs.numOfCre << "," << cs.maxStu;
+	fileout << cs.id << "," << cs.name << "," << cs.className << "," << cs.teacherName << "," << cs.day << "," << cs.time << "," << cs.numOfCre << "," << cs.maxStu;
 	fileout.close();
-	path= "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\"+ cs.id+".csv";
+	path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\" + cs.id + ".csv";
 	fileout.open(path, ios::out);
 	fileout.close();
 	int pos = 0;
@@ -768,7 +613,7 @@ void addCoursetoSemester(SchoolYearArray& lsy,Semester &sm, Course cs) {
 	}
 
 }
-void addStudenttoCourse(SchoolYear &sy) {
+void addStudenttoCourse(SchoolYear& sy) {
 	for (int m = 0; m < sy.n; m++) {
 		for (int i = 0; i < sy.schoolLevel[m].n; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -789,21 +634,21 @@ void addStudenttoCourse(SchoolYear &sy) {
 				break;
 			}
 			fileout.open(path, ios::out);
-				for (int i = 0; i < sy.semester[j].course[k].n; i++) {
-					fileout << sy.semester[j].course[k].students[i].id << ","
-						<< sy.semester[j].course[k].students[i].lastName << ","
-						<< sy.semester[j].course[k].students[i].firstName << ","
-						<< sy.semester[j].course[k].students[i].dateofBirth << ","
-						<< sy.semester[j].course[k].students[i].sex << ","
-						<< sy.semester[j].course[k].students[i].socialid;
-					if (i != sy.semester[j].course[k].n - 1) fileout << endl;
-				}
-			
+			for (int i = 0; i < sy.semester[j].course[k].n; i++) {
+				fileout << sy.semester[j].course[k].students[i].id << ","
+					<< sy.semester[j].course[k].students[i].lastName << ","
+					<< sy.semester[j].course[k].students[i].firstName << ","
+					<< sy.semester[j].course[k].students[i].dateofBirth << ","
+					<< sy.semester[j].course[k].students[i].sex << ","
+					<< sy.semester[j].course[k].students[i].socialid;
+				if (i != sy.semester[j].course[k].n - 1) fileout << endl;
+			}
+
 			fileout.close();
 		}
 	}
 }
-void updateCourse(Semester &sm,int key1, int key2, string change) {
+void updateCourse(Semester& sm, int key1, int key2, string change) {
 	if (key2 == 1) sm.course[key1 - 1].className = change;
 	if (key2 == 2) sm.course[key1 - 1].teacherName = change;
 	if (key2 == 3) sm.course[key1 - 1].numOfCre = stoi(change);
@@ -814,20 +659,20 @@ void updateCourse(Semester &sm,int key1, int key2, string change) {
 	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\course.csv";
 	fileout.open(path, ios::out);
 	if (!isFileEmpty(path)) fileout << endl;
-	for (int i = 0; i < sm.n-1; i++) {
-		fileout << sm.course[i].id << "," << sm.course[i].name << "," << sm.course[i].className << "," << sm.course[i].teacherName << "," <<sm.course[i].day << "," << sm.course[i].time <<"," << sm.course[i].numOfCre << "," << sm.course[i].maxStu << endl;
+	for (int i = 0; i < sm.n - 1; i++) {
+		fileout << sm.course[i].id << "," << sm.course[i].name << "," << sm.course[i].className << "," << sm.course[i].teacherName << "," << sm.course[i].day << "," << sm.course[i].time << "," << sm.course[i].numOfCre << "," << sm.course[i].maxStu << endl;
 	}
-	fileout << sm.course[sm.n - 1].id << "," << sm.course[sm.n - 1].name << "," << sm.course[sm.n - 1].className << "," << sm.course[sm.n - 1].teacherName << "," <<sm.course[sm.n - 1].day << "," << sm.course[sm.n - 1].time<<"," << sm.course[sm.n - 1].numOfCre << "," << sm.course[sm.n - 1].maxStu;
+	fileout << sm.course[sm.n - 1].id << "," << sm.course[sm.n - 1].name << "," << sm.course[sm.n - 1].className << "," << sm.course[sm.n - 1].teacherName << "," << sm.course[sm.n - 1].day << "," << sm.course[sm.n - 1].time << "," << sm.course[sm.n - 1].numOfCre << "," << sm.course[sm.n - 1].maxStu;
 	fileout.close();
 }
-void addaStudenttoCourse(Semester &sm,int key, Student stu) {
+void addaStudenttoCourse(Semester& sm, int key, Student stu) {
 	ofstream fileout;
 	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\" + sm.course[key - 1].id + ".csv";
 	fileout.open(path, ios::app);
 	if (!isFileEmpty(path)) fileout << endl;
 	fileout << stu.id << "," << stu.lastName << "," << stu.firstName << "," << stu.dateofBirth << "," << stu.sex << "," << stu.socialid;
 	fileout.close();
-	if (sm.course[key-1].students == NULL) {
+	if (sm.course[key - 1].students == NULL) {
 		sm.course[key - 1].n = 1;
 		sm.course[key - 1].students = new Student[sm.course[key - 1].n];
 		sm.course[key - 1].students[sm.course[key - 1].n - 1] = stu;
@@ -838,11 +683,11 @@ void addaStudenttoCourse(Semester &sm,int key, Student stu) {
 	sm.course[key - 1].students[sm.course[key - 1].n - 1] = stu;
 }
 void removeaStudentfromCourse(Semester& sm, int key1, int key2) {
-	for (int i = key2-1; i < sm.course[key1-1].n-1; i++) {
-		sm.course[key1-1].students[i] = sm.course[key1-1].students[i + 1];
+	for (int i = key2 - 1; i < sm.course[key1 - 1].n - 1; i++) {
+		sm.course[key1 - 1].students[i] = sm.course[key1 - 1].students[i + 1];
 	}
-	sm.course[key1-1].n--;
-	string  path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\" + sm.course[key1- 1].id + ".csv";
+	sm.course[key1 - 1].n--;
+	string  path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\" + sm.course[key1 - 1].id + ".csv";
 	ofstream fileout(path, ios::out);
 	for (int i = 0; i < sm.course[key1 - 1].n; i++) {
 		fileout << sm.course[key1 - 1].students[i].id << "," << sm.course[key1 - 1].students[i].lastName << "," << sm.course[key1 - 1].students[i].firstName << "," << sm.course[key1 - 1].students[i].dateofBirth << "," << sm.course[key1 - 1].students[i].sex << "," << sm.course[key1 - 1].students[i].socialid;
@@ -850,21 +695,21 @@ void removeaStudentfromCourse(Semester& sm, int key1, int key2) {
 	}
 	fileout.close();
 }
-void deleteCourse(Semester& sm, int key){
-	for (int i = key - 1; i < sm.n-1; i++) {
+void deleteCourse(Semester& sm, int key) {
+	for (int i = key - 1; i < sm.n - 1; i++) {
 		sm.course[i] = sm.course[i + 1];
 	}
 	sm.n--;
 	string  path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\course.csv";
 	ofstream fileout(path, ios::out);
 	for (int i = 0; i < sm.n; i++) {
-		fileout << sm.course[i].id << "," << sm.course[i].name << "," << sm.course[i].className << "," << sm.course[i].teacherName << "," << sm.course[i].day << "," << sm.course[i].time<<"," << sm.course[i].numOfCre << "," << sm.course[i].maxStu;
+		fileout << sm.course[i].id << "," << sm.course[i].name << "," << sm.course[i].className << "," << sm.course[i].teacherName << "," << sm.course[i].day << "," << sm.course[i].time << "," << sm.course[i].numOfCre << "," << sm.course[i].maxStu;
 		if (i != sm.n - 1) fileout << endl;
 	}
 	fileout.close();
 }
 UserArray getUserArray() {
-	UserArray usA={NULL, 0};
+	UserArray usA = { NULL, 0 };
 	ifstream filein("source\\user.csv", ios_base::in);
 	string line;
 	while (getline(filein, line)) usA.n++;
@@ -873,7 +718,7 @@ UserArray getUserArray() {
 	usA.user = new User[usA.n];
 	int cnt = 0;
 	while (!filein.eof()) {
-		getline(filein, (usA.user+cnt)->username, ',');
+		getline(filein, (usA.user + cnt)->username, ',');
 		getline(filein, (usA.user + cnt)->password);
 		cnt++;
 	}
@@ -965,14 +810,14 @@ void createScoreBoardFile(Semester sm) {
 	for (int i = 0; i < sm.n; i++) {
 		path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\" + sm.course[i].id + ".csv";
 		fileout.open(path, ios::out);
-		for (int j = 0; j < sm.course[i].n-1; j++) {
+		for (int j = 0; j < sm.course[i].n - 1; j++) {
 			fileout << sm.course[i].students[j].id << "," << sm.course[i].students[j].lastName << " " << sm.course[i].students[j].firstName << endl;
 		}
 		fileout << sm.course[i].students[sm.course[i].n - 1].id << "," << sm.course[i].students[sm.course[i].n - 1].lastName << " " << sm.course[i].students[sm.course[i].n - 1].firstName;
 		fileout.close();
 	}
 }
-void readScoreBoard(Semester &sm) {
+void readScoreBoard(Semester& sm) {
 	string path;
 	ifstream filein;
 	for (int i = 0; i < sm.n; i++) {
@@ -982,7 +827,7 @@ void readScoreBoard(Semester &sm) {
 		int cnt = 0;
 		while (!filein.eof()) {
 			string temp;
-			getline(filein,temp, ',');
+			getline(filein, temp, ',');
 			getline(filein, temp, ',');
 			filein >> sm.course[i].students[cnt].mark.total;
 			filein.seekg(1, 1);
@@ -998,16 +843,16 @@ void readScoreBoard(Semester &sm) {
 		filein.close();
 	}
 }
-void updateScoreBoard(Semester& sm, int key1, int key2,int key3, float change) {
-	if (key3 == 1) sm.course[key1 - 1].students[key2-1].mark.total = change;
+void updateScoreBoard(Semester& sm, int key1, int key2, int key3, float change) {
+	if (key3 == 1) sm.course[key1 - 1].students[key2 - 1].mark.total = change;
 	if (key3 == 2) sm.course[key1 - 1].students[key2 - 1].mark.final = change;
 	if (key3 == 3) sm.course[key1 - 1].students[key2 - 1].mark.midterm = change;
 	if (key3 == 4) sm.course[key1 - 1].students[key2 - 1].mark.other = change;
 	ofstream fileout;
-	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\"+sm.course[key1-1].id+".csv";
+	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\" + sm.course[key1 - 1].id + ".csv";
 	fileout.open(path, ios::out);
 	if (!isFileEmpty(path)) fileout << endl;
-	for (int i = 0; i < sm.course[key1-1].n-1; i++) {
+	for (int i = 0; i < sm.course[key1 - 1].n - 1; i++) {
 		fileout << sm.course[key1 - 1].students[i].id << "," << sm.course[key1 - 1].students[i].lastName << " " << sm.course[key1 - 1].students[i].firstName << "," << sm.course[key1 - 1].students[i].mark.total << "," << sm.course[key1 - 1].students[i].mark.final << "," << sm.course[key1 - 1].students[i].mark.midterm << "," << sm.course[key1 - 1].students[i].mark.other << endl;
 	}
 	int i = sm.course[key1 - 1].n - 1;
@@ -1019,14 +864,14 @@ void createAllScoreFile(Semester sm) {
 	ofstream fileout;
 	fileout.open(path, ios::out);
 	for (int i = 0; i < sm.n; i++) {
-		for (int j = 0; j < sm.course[i].n-1 ; j++) {
-			fileout << sm.course[i].students[j].id << "," << sm.course[i].name<<","<< sm.course[i].students[j].mark.total<<","<< sm.course[i].students[j].mark.final<<"," << sm.course[i].students[j].mark.midterm<<","<< sm.course[i].students[j].mark.other << endl;
+		for (int j = 0; j < sm.course[i].n - 1; j++) {
+			fileout << sm.course[i].students[j].id << "," << sm.course[i].name << "," << sm.course[i].students[j].mark.total << "," << sm.course[i].students[j].mark.final << "," << sm.course[i].students[j].mark.midterm << "," << sm.course[i].students[j].mark.other << endl;
 			cout << sm.course[i].students[j].id << "," << sm.course[i].name << "," << sm.course[i].students[j].mark.total << "," << sm.course[i].students[j].mark.final << "," << sm.course[i].students[j].mark.midterm << "," << sm.course[i].students[j].mark.other << endl;
 		}
 	}
 	fileout.close();
 }
-void readScoreforStudent(Semester sm,Student &st) {
+void readScoreforStudent(Semester sm, Student& st) {
 	st.markofCourse = new MarkofCourse[10];
 	st.n = 0;
 	string path = "source\\" + sm.nameYear + "\\" + returnNameofSemester(sm.name) + "\\scoreboard\\allscore.csv";
@@ -1038,7 +883,7 @@ void readScoreforStudent(Semester sm,Student &st) {
 		string temp;
 		getline(filein, temp, ',');
 		if (temp == st.id) {
-			getline(filein,st.markofCourse[cnt].courseName, ',');
+			getline(filein, st.markofCourse[cnt].courseName, ',');
 			filein >> st.markofCourse[cnt].mark.total;
 			filein.seekg(1, 1);
 			filein >> st.markofCourse[cnt].mark.final;
@@ -1055,15 +900,6 @@ void readScoreforStudent(Semester sm,Student &st) {
 		}
 	}
 }
-void readScoreforClass(Semester sm, SchoolYear &schoolYear) {
-	for (int i = 0; i < schoolYear.n; i++) {
-		for (int j = 0; j < schoolYear.schoolLevel[i].n;j++) {
-			for (int k = 0; k < schoolYear.schoolLevel[i].classes[j].n;k++) {
-				readScoreforStudent(sm,schoolYear.schoolLevel[i].classes[i].Students[k]);
-			}
-		} 
-	}
-}
 void showClasswithScore(SchoolYear sy, string ClassName) {
 	double diem = 0;
 	cout << YELLOW;
@@ -1077,17 +913,17 @@ void showClasswithScore(SchoolYear sy, string ClassName) {
 		for (int j = 0; j < sy.schoolLevel[i].n; j++) {
 			if (ClassName == sy.schoolLevel[i].classes[j].name) {
 				for (int k = 0; k < sy.schoolLevel[i].classes[j].n; k++) {
-					cout << setw(10) << "" << left << setw(10) << GREEN << k + 1<<".";
+					cout << setw(10) << "" << left << setw(10) << GREEN << k + 1 << ".";
 					cout << left << setw(13) << GREEN << sy.schoolLevel[i].classes[j].Students[k].id;
 					cout << left << setw(12) << GREEN << sy.schoolLevel[i].classes[j].Students[k].lastName << " " << sy.schoolLevel[i].classes[j].Students[k].firstName << RESET;
 					cout << right << setw(12);
 					cout << endl;
 					readScoreforStudent(curSemester, sy.schoolLevel[i].classes[j].Students[k]);
 					for (int h = 0; h < sy.schoolLevel[i].classes[j].Students[k].n; h++) {
-						cout <<setw(15)<<""<<YELLOW<<"-->" << sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].courseName << RESET << ": " << sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].mark.final << endl;
+						cout << setw(15) << "" << YELLOW << "-->" << sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].courseName << RESET << ": " << sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].mark.final << endl;
 						diem = diem + sy.schoolLevel[i].classes[j].Students[k].markofCourse[h].mark.final;
 					}
-					cout << setw(15) << "" << YELLOW << "-->GPA: " << RESET << diem / sy.schoolLevel[i].classes[j].Students[k].n  << endl;
+					cout << setw(15) << "" << YELLOW << "-->GPA: " << RESET << diem / sy.schoolLevel[i].classes[j].Students[k].n << endl;
 					diem = 0;
 				}
 				break;
@@ -1098,11 +934,11 @@ void showClasswithScore(SchoolYear sy, string ClassName) {
 User inputUser(int pos) {
 	User us;
 	cout << "\n\n\n\n\n\n\n\n\n\n\n";
-	cout << setw(pos+7) << "" << "LOGIN" << endl;
-	cout << setw(pos-5) << "" << "/-------------<>-------------\\" << endl;
-	cout << setw(pos-3) << "" << "Username: ";
+	cout << setw(pos + 7) << "" << "LOGIN" << endl;
+	cout << setw(pos - 5) << "" << "/-------------<>-------------\\" << endl;
+	cout << setw(pos - 3) << "" << "Username: ";
 	getline(cin, us.username);
-	cout << setw(pos-3) << "" << "Password: ";
+	cout << setw(pos - 3) << "" << "Password: ";
 	getline(cin, us.password);
 	return us;
 }
@@ -1115,21 +951,21 @@ User login(UserArray usA) {
 		us = inputUser(pos);
 		k = check_login(usA, us);
 		cout << endl;
-		if (k == 1) cout<<GREEN << setw(pos + 5 ) << "" << "Success! ";
-		if (k == -1)cout<<RED << setw(pos +2) << "" << "Wrong password! ";
-		if (k == 0) cout<<RED << setw(pos +2) << "" << "Wrong username! ";
+		if (k == 1) cout << GREEN << setw(pos + 5) << "" << "Success! ";
+		if (k == -1)cout << RED << setw(pos + 2) << "" << "Wrong password! ";
+		if (k == 0) cout << RED << setw(pos + 2) << "" << "Wrong username! ";
 		cout << RESET;
-		int x=_getch();
+		int x = _getch();
 		pos = 57;
 	} while (k == -1 || k == 0);
 	return us;
 }
 void printStaffInfo(StaffInfo si, int n) {
-	cout <<setw(10) <<"" << left << setw(20) << si.name;
+	cout << setw(10) << "" << left << setw(20) << si.name;
 	cout << left << setw(20) << si.dateofBirth;
 	cout << left << setw(10) << si.sex;
-	cout <<left << setw(15) << si.position;
-	cout <<left << setw(30) << si.email;
+	cout << left << setw(15) << si.position;
+	cout << left << setw(30) << si.email;
 	cout << left << setw(15) << si.id;
 	cout << right << setw(15);
 	cout << endl;
@@ -1139,11 +975,11 @@ void changePassword(UserArray& usA, User& us) {
 	string newPass;
 	string newPass2;
 	while (true) {
-		cout << setw(50)<<""<<"Input current password: ";
+		cout << setw(50) << "" << "Input current password: ";
 		getline(cin, curPass);
 		if (curPass != us.password) {
 			cout << RED;
-			cout << setw(50) << ""<< "Wrong password!" << endl;
+			cout << setw(50) << "" << "Wrong password!" << endl;
 			cout << RESET;
 			int x = _getch();
 		}
@@ -1155,14 +991,14 @@ void changePassword(UserArray& usA, User& us) {
 		cout << setw(50) << "" << "Input again: ";
 		getline(cin, newPass2);
 		if (newPass == curPass) {
-			cout << setw(50) << ""<<RED << "Same old password!"<<RESET << endl;
+			cout << setw(50) << "" << RED << "Same old password!" << RESET << endl;
 		}
 		else if (newPass != newPass2) {
-			cout << setw(50) << ""<<RED << "Not match!"<<RESET << endl;
+			cout << setw(50) << "" << RED << "Not match!" << RESET << endl;
 		}
 		else break;
 	}
-	cout << setw(50) << ""<<GREEN << "Success!"<<RESET;
+	cout << setw(50) << "" << GREEN << "Success!" << RESET;
 	us.password = newPass;
 	for (int i = 0; i < usA.n; i++) {
 		if (usA.user[i].username == us.username) {
@@ -1177,7 +1013,7 @@ void changePassword(UserArray& usA, User& us) {
 	fileout << usA.user[usA.n - 1].username << "," << usA.user[usA.n - 1].password;
 	fileout.close();
 }
-void userAccount(StaffInfo si, User &us) {
+void userAccount(StaffInfo si, User& us) {
 	char menuItems[3][30] = { "View my profile", "Change password", "Exit" };
 	int selectedItem = 0;
 	char key;
@@ -1194,7 +1030,7 @@ void userAccount(StaffInfo si, User &us) {
 				int temp = 0;
 				if (i == 0) temp = 9;
 				if (i == 1) temp = 9;
-				if (i == 2) temp = 20; 
+				if (i == 2) temp = 20;
 				cout << setw(pos - 8) << "|   " << "" << " " << GREEN << menuItems[i] << RESET << setw(temp) << "|" << endl;
 				if (i != 2) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
 			}
@@ -1241,7 +1077,7 @@ void userAccount(StaffInfo si, User &us) {
 }
 void showListofCourse(Semester sm) {
 	cout << YELLOW;
-	cout <<setw(10)<<""<< left << setw(5) << "No";
+	cout << setw(10) << "" << left << setw(5) << "No";
 	cout << left << setw(12) << "ID";
 	cout << left << setw(22) << "Name";
 	cout << left << setw(12) << "Class";
@@ -1254,7 +1090,7 @@ void showListofCourse(Semester sm) {
 	cout << RESET;
 	cout << endl;
 	for (int i = 0; i < sm.n; i++) {
-		cout << setw(10) << "" << left << setw(5) << i+1;
+		cout << setw(10) << "" << left << setw(5) << i + 1;
 		cout << left << setw(12) << sm.course[i].id;
 		cout << left << setw(22) << sm.course[i].name;
 		cout << left << setw(12) << sm.course[i].className;
@@ -1268,10 +1104,10 @@ void showListofCourse(Semester sm) {
 	}
 }
 void showListofClasses(SchoolYearArray syA, string nameYear) {
-	for (int i = 0 ; i < syA.n; i++) {
+	for (int i = 0; i < syA.n; i++) {
 		if (syA.schoolYears[i].name == nameYear) {
 			for (int j = 0; j < 4; j++) {
-				cout <<setw(20)<<""<<YELLOW << syA.schoolYears[i].schoolLevel[j].name <<RESET;
+				cout << setw(20) << "" << YELLOW << syA.schoolYears[i].schoolLevel[j].name << RESET;
 			}
 			cout << endl;
 			cout << setw(20) << "" << "--<->--" << setw(21) << "" << "--<->--" << setw(21) << "" << "--<->--" << setw(21) << "" << "--<->--";
@@ -1306,13 +1142,13 @@ void showListStudentinCourse(Semester sm, int key) {
 	if (sm.course == NULL) return;
 	if (sm.course[key - 1].n == 0) return;
 	if (sm.course[key - 1].students == NULL) return;
-	for (int i = 0; i < sm.course[key-1].n; i++) {
+	for (int i = 0; i < sm.course[key - 1].n; i++) {
 		cout << setw(20) << "" << left << setw(10) << i + 1;
-		cout << left << setw(15) << sm.course[key-1].students[i].id;
-		cout << left << setw(20) << sm.course[key-1].students[i].lastName + " " + sm.course[key-1].students[i].firstName;
-		cout << left << setw(20) << sm.course[key-1].students[i].dateofBirth;
-		cout << left << setw(15) << sm.course[key-1].students[i].sex;
-		cout << left << setw(22) << sm.course[key-1].students[i].socialid;
+		cout << left << setw(15) << sm.course[key - 1].students[i].id;
+		cout << left << setw(20) << sm.course[key - 1].students[i].lastName + " " + sm.course[key - 1].students[i].firstName;
+		cout << left << setw(20) << sm.course[key - 1].students[i].dateofBirth;
+		cout << left << setw(15) << sm.course[key - 1].students[i].sex;
+		cout << left << setw(22) << sm.course[key - 1].students[i].socialid;
 		cout << right << setw(22);
 		cout << endl;
 	}
@@ -1383,7 +1219,7 @@ void showListStudent(SchoolYearArray syA, string nameYear, string className) {
 	cout << RED << "NULL!" << RESET;
 }
 void classOption() {
-	char menuItems[5][30] = { "Create class", "View list of classes","Input Student","Quick input" ,"Exit"};
+	char menuItems[5][30] = { "Create class", "View list of classes","Input Student","Quick input" ,"Exit" };
 	int selectedItem = 0;
 	char key;
 	int pos = 61;
@@ -1396,7 +1232,7 @@ void classOption() {
 		cout << "Call us : (028) 3835 4266" << endl;
 		cout << "E-mail : info@fit.hcmus.edu.vn" << endl;
 		cout << "\n\n\n\n\n";
-		cout << setw(pos - 3) << "" <<GREEN<< "CLASS OPTION"<<RESET << endl;
+		cout << setw(pos - 3) << "" << GREEN << "CLASS OPTION" << RESET << endl;
 		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
 		for (int i = 0; i < 5; i++) {
 			if (i == selectedItem) {
@@ -1431,17 +1267,17 @@ void classOption() {
 			break;
 		case 13:
 			if (selectedItem == 0) {
-				cout << setw(45) << ""<<GREEN << "Input school year: "<<RESET;
+				cout << setw(45) << "" << GREEN << "Input school year: " << RESET;
 				getline(cin, schoolYearName);
 				cout << setw(45) << "" << GREEN << "Input school level: " << RESET;
 				getline(cin, schoolLevel);
-				cout << setw(45)<<"" << GREEN << "Input number of classes: " << RESET;
+				cout << setw(45) << "" << GREEN << "Input number of classes: " << RESET;
 				cin >> n;
 				cin.ignore();
 				for (int i = 0; i < schoolYearArray.n; i++) {
 					if (schoolYearArray.schoolYears[i].name == schoolYearName) {
 						for (int j = 0; j < n; j++) {
-							cout << setw(45) << "" << GREEN << "Input class name(CTT/CLC/VP/APCS): "<<RESET;
+							cout << setw(45) << "" << GREEN << "Input class name(CTT/CLC/VP/APCS): " << RESET;
 							getline(cin, className);
 							addClasstoSchoolYear(schoolYearArray.schoolYears[i], schoolLevel, className);
 						}
@@ -1451,7 +1287,7 @@ void classOption() {
 				cout << setw(45) << "" << GREEN << "Success!" << RESET;
 			}
 			if (selectedItem == 1) {
-				cout <<setw(38)<<"" << GREEN << "Input school year you want to view classes: "<<RESET;
+				cout << setw(38) << "" << GREEN << "Input school year you want to view classes: " << RESET;
 				getline(cin, schoolYearName);
 				cout << endl;
 				showListofClasses(schoolYearArray, schoolYearName);
@@ -1495,7 +1331,7 @@ void classOption() {
 	} while (key != 27);
 }
 void courseOption() {
-	char menuItems[7][30] = {"View course" ,"Create course","Update course","Delete course","Export course","View scoreboard" ,"Exit"};
+	char menuItems[7][30] = { "View course" ,"Create course","Update course","Delete course","Export course","View scoreboard" ,"Exit" };
 	int selectedItem = 0;
 	char key;
 	int pos = 61;
@@ -1512,7 +1348,7 @@ void courseOption() {
 		system("cls");
 		cout << "Call us : (028) 3835 4266" << endl;
 		cout << "E-mail : info@fit.hcmus.edu.vn" << endl;
-		cout << setw(pos - 3) << "" <<GREEN<< "COURSE OPTION" <<RESET<< endl << endl;
+		cout << setw(pos - 3) << "" << GREEN << "COURSE OPTION" << RESET << endl << endl;
 		showListofCourse(curSemester);
 		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
 		for (int i = 0; i < 7; i++) {
@@ -1581,7 +1417,7 @@ void courseOption() {
 				cin >> n;
 				cin.ignore();
 				for (int i = 0; i < n; i++) {
-					cout << setw(45) << "" << GREEN << "Input course "<<i+1 << RESET<<endl;
+					cout << setw(45) << "" << GREEN << "Input course " << i + 1 << RESET << endl;
 					cs = createCourse();
 					addCoursetoSemester(schoolYearArray, curSemester, cs);
 				}
@@ -1615,8 +1451,8 @@ void courseOption() {
 				cout << setw(45) << "" << GREEN << "Done!" << RESET;
 			}
 			if (selectedItem == 5) {
-				cout << setw(45) << "" << GREEN << "1. View scoreboard of course"<<endl << RESET;
-				cout << setw(45) << "" << GREEN << "2. View scoreboard of class"<<endl << RESET;
+				cout << setw(45) << "" << GREEN << "1. View scoreboard of course" << endl << RESET;
+				cout << setw(45) << "" << GREEN << "2. View scoreboard of class" << endl << RESET;
 				cout << setw(45) << "" << GREEN << "Your choose: " << RESET;
 				cin >> key1;
 				cin.ignore();
@@ -1651,7 +1487,7 @@ void courseOption() {
 					}
 					cout << setw(45) << "" << GREEN << "Input a class you want to view: " << RESET;
 					getline(cin, className);
-					showClasswithScore(curSchoolYear,className);
+					showClasswithScore(curSchoolYear, className);
 				}
 			}
 			if (selectedItem == 6) return;
@@ -1661,7 +1497,7 @@ void courseOption() {
 	} while (key != 27);
 }
 void mutilTask() {
-	char menuItems[5][30] = { "Create school year","Create semester", "Class option", "Course option" ,"Exit"};
+	char menuItems[5][30] = { "Create school year","Create semester", "Class option", "Course option" ,"Exit" };
 	int selectedItem = 0;
 	char key;
 	int pos = 61;
@@ -1671,7 +1507,7 @@ void mutilTask() {
 		cout << "Call us : (028) 3835 4266" << endl;
 		cout << "E-mail : info@fit.hcmus.edu.vn" << endl;
 		cout << "\n\n\n\n\n";
-		cout << setw(pos-7) << "" << GREEN<<"MULTI-TASKING OPTION" <<RESET<< endl;
+		cout << setw(pos - 7) << "" << GREEN << "MULTI-TASKING OPTION" << RESET << endl;
 		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
 		for (int i = 0; i < 5; i++) {
 			if (i == selectedItem) {
@@ -1682,7 +1518,7 @@ void mutilTask() {
 				if (i == 3) temp = 11;
 				if (i == 4) temp = 20;
 				cout << setw(pos - 8) << "|   " << "" << " " << GREEN << menuItems[i] << RESET << setw(temp) << "|" << endl;
-				if (i!=4) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
+				if (i != 4) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
 			}
 			else {
 				int temp = 0;
@@ -1692,7 +1528,7 @@ void mutilTask() {
 				if (i == 3) temp = 12;
 				if (i == 4) temp = 21;
 				cout << setw(pos - 8) << "|   " << "" << menuItems[i] << setw(temp) << "|" << endl;
-				if (i!=4) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
+				if (i != 4) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
 			}
 		}
 		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
@@ -1706,10 +1542,10 @@ void mutilTask() {
 			break;
 		case 13:
 			if (selectedItem == 0) {
-				cout << setw(50) << ""<<GREEN << "Input school year name: "<<RESET;
+				cout << setw(50) << "" << GREEN << "Input school year name: " << RESET;
 				getline(cin, schoolYearName);
 				createSchoolYear(schoolYearArray, schoolYearName);
-				cout << setw(50)<< "" << GREEN << "Succcess!" << RESET << endl;
+				cout << setw(50) << "" << GREEN << "Succcess!" << RESET << endl;
 			}
 			if (selectedItem == 1) {
 				Semester sm = createSemester();
@@ -1730,67 +1566,8 @@ void mutilTask() {
 }
 void Staff_menu() {
 	StaffInfoArray siA = getStaffInfoArray();
-	StaffInfo si = getCurStaffInfo(siA,us);
+	StaffInfo si = getCurStaffInfo(siA, us);
 	char menuItems[3][30] = { "User Account", "Multi-tasking option", "Log out" };
-	int selectedItem = 0;
-	char key;
-	int pos = 61;
-	do {
-		system("cls");
-		cout << "Call us : (028) 3835 4266" << endl;
-		cout << "E-mail : info@fit.hcmus.edu.vn" << endl;
-		cout << "\n\n";
-		cout << setw(pos - 2) << "" <<GREEN<< "HOME PAGE"<<RESET << endl<<endl;
-		cout << setw(pos - 12) << "" <<"Semester-"<< curSemester.name<<"/" << curSemester.nameYear << endl;
-		if (si.sex == "Nam") cout << setw(pos - 12) << "" << "Staff: " << "Mr." << si.name << endl;
-		else cout << setw(pos - 12) << "" << "Staff: " << "Ms." << si.name << endl;
-		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
-		for (int i = 0; i < 3; i++) {
-			if (i == selectedItem) {
-				int temp = 0;
-				if (i == 0) temp = 12;
-				if (i == 1) temp = 4;
-				if (i == 2) temp = 17;
-				cout << setw(pos-8) << "|   " << "" << " " << GREEN << menuItems[i] << RESET << setw(temp) << "|" << endl;
-				if (i != 2) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
-			}
-			else {
-				int temp = 0;
-				if (i == 0) temp = 13;
-				if (i == 1) temp = 5;
-				if (i == 2) temp = 18;
-				cout << setw(pos-8) << "|   " << "" << menuItems[i] << setw(temp) << "|" << endl;
-				if (i != 2) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
-			}
-		}
-		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
-		key = _getch();
-		switch (key) {
-		case 72: 
-			selectedItem = (selectedItem - 1 + 3) % 3;
-			break;
-		case 80: 
-			selectedItem = (selectedItem + 1) % 3;
-			break;
-		case 13: 
-	
-			if (selectedItem == 0) {
-				userAccount(si, us);
-			}
-			if (selectedItem == 1)
-				mutilTask();
-			if (selectedItem == 2) return;
-			//int x=_getch();
-			break;
-		}
-
-	} while (key != 27); 
-}
-void Student_menu() {
-	Class cl = getstudentInfoArray();
-	Student stu = getCurStudentInfo(cl, us);
-	Semester couforStu;
-	char menuItems[5][30] = { "View your info", "Your course","View scoreboard","Change password" ,"Log out"};
 	int selectedItem = 0;
 	char key;
 	int pos = 61;
@@ -1801,7 +1578,66 @@ void Student_menu() {
 		cout << "\n\n";
 		cout << setw(pos - 2) << "" << GREEN << "HOME PAGE" << RESET << endl << endl;
 		cout << setw(pos - 12) << "" << "Semester-" << curSemester.name << "/" << curSemester.nameYear << endl;
-		cout << setw(pos - 12) << ""  << curSemester.startDate << "-" << curSemester.endDate  << endl;
+		if (si.sex == "Nam") cout << setw(pos - 12) << "" << "Staff: " << "Mr." << si.name << endl;
+		else cout << setw(pos - 12) << "" << "Staff: " << "Ms." << si.name << endl;
+		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
+		for (int i = 0; i < 3; i++) {
+			if (i == selectedItem) {
+				int temp = 0;
+				if (i == 0) temp = 12;
+				if (i == 1) temp = 4;
+				if (i == 2) temp = 17;
+				cout << setw(pos - 8) << "|   " << "" << " " << GREEN << menuItems[i] << RESET << setw(temp) << "|" << endl;
+				if (i != 2) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
+			}
+			else {
+				int temp = 0;
+				if (i == 0) temp = 13;
+				if (i == 1) temp = 5;
+				if (i == 2) temp = 18;
+				cout << setw(pos - 8) << "|   " << "" << menuItems[i] << setw(temp) << "|" << endl;
+				if (i != 2) cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
+			}
+		}
+		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
+		key = _getch();
+		switch (key) {
+		case 72:
+			selectedItem = (selectedItem - 1 + 3) % 3;
+			break;
+		case 80:
+			selectedItem = (selectedItem + 1) % 3;
+			break;
+		case 13:
+
+			if (selectedItem == 0) {
+				userAccount(si, us);
+			}
+			if (selectedItem == 1)
+				mutilTask();
+			if (selectedItem == 2) return;
+			//int x=_getch();
+			break;
+		}
+
+	} while (key != 27);
+}
+void Student_menu() {
+	Class cl = getstudentInfoArray();
+	Student stu = getCurStudentInfo(cl, us);
+	Semester couforStu;
+	char menuItems[5][30] = { "View your info", "Your course","View scoreboard","Change password" ,"Log out" };
+	int selectedItem = 0;
+	char key;
+	int pos = 61;
+	do {
+		system("cls");
+		cout << "Call us : (028) 3835 4266" << endl;
+		cout << "E-mail : info@fit.hcmus.edu.vn" << endl;
+		cout << "\n\n";
+		cout << setw(pos - 2) << "" << GREEN << "HOME PAGE" << RESET << endl << endl;
+		cout << setw(pos - 12) << "" << "Semester-" << curSemester.name << "/" << curSemester.nameYear << endl;
+		cout << setw(pos - 12) << "" << curSemester.startDate << "-" << curSemester.endDate << endl;
 		cout << setw(pos - 3) << "Student: " << stu.lastName << " " << stu.firstName << endl;
 		cout << setw(pos - 12) << "" << "+---------------------------+" << endl;
 		for (int i = 0; i < 5; i++) {
@@ -1874,7 +1710,7 @@ void Student_menu() {
 				cout << endl;
 				cout << setw(20) << "" << "--<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->----<->--";
 				cout << endl;
-				if (stu.markofCourse==NULL) return;
+				if (stu.markofCourse == NULL) return;
 				for (int i = 0; i < stu.n; i++) {
 					cout << setw(20) << "" << left << setw(10) << i + 1;
 					cout << left << setw(34) << stu.markofCourse[i].courseName;
