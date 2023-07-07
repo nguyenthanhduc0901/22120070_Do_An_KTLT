@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <iomanip>
 #include <conio.h>
+#include "menu.h"
 using namespace std;
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
@@ -155,7 +156,7 @@ User inputUser(int pos);
 User login(UserArray usA);
 void printStaffInfo(StaffInfo si, int n);
 void changePassword(UserArray& usA, User& us);
-void userAccount(StaffInfo si, User& us, UserArray userArray);
+void userAccount(StaffInfo si, User& us);
 void showListofCourse(Semester sm);
 void showListofClasses(SchoolYearArray syA, string nameYear);
 void showListStudentinCourse(Semester sm, int key);
